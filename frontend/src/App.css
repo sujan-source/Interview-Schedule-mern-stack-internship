@@ -1,0 +1,160 @@
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ================= PAGE LAYOUT ================= */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1f4037, #99f2c8);
+}
+
+/* Root wrapper */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  background: #1f4037;
+  color: #fff;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar h2 {
+  font-size: 20px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #f1f1f1;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: #99f2c8;
+}
+
+/* ================= MAIN CONTENT ================= */
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* ================= CARD (LOGIN / SIGNUP / FORM) ================= */
+.container {
+  background: #ffffff;
+  width: 360px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Heading */
+.container h2 {
+  margin-bottom: 20px;
+  color: #1f4037;
+}
+
+/* ================= INPUTS ================= */
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1f4037;
+}
+
+/* ================= BUTTON ================= */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Switch link */
+.switch-text {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #1f4037;
+  cursor: pointer;
+}
+
+.switch-text:hover {
+  text-decoration: underline;
+}
+
+/* ================= DASHBOARD LIST ================= */
+ul {
+  margin-top: 15px;
+  text-align: left;
+}
+
+li {
+  background: #e9f5ef;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #1f4037;
+}
+
+/* ================= FOOTER ================= */
+.footer {
+  background: #263238;
+  color: #ddd;
+  padding: 30px 40px;
+}
+
+.footer-grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer h4 {
+  margin-bottom: 10px;
+  color: #99f2c8;
+}
+
+.footer p {
+  font-size: 14px;
+  line-height: 1.6;
+}
