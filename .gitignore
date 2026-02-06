@@ -1,0 +1,9 @@
+node_modules/
+.env
+mongo_data/
+*.log
+backend_files.txt
+error.log
+mongo_diag.log
+mongo_startup.log
+.antigravityignore

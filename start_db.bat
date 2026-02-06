@@ -11,7 +11,7 @@ echo.
 if not exist "%~dp0mongo_data" mkdir "%~dp0mongo_data"
 
 :: Start MongoDB
-mongod --dbpath="%~dp0mongo_data"
+"C:\Program Files\MongoDB\Server\8.2\bin\mongod.exe" --dbpath="%~dp0mongo_data"
 
 if %errorlevel% neq 0 (
     echo.
