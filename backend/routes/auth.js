@@ -5,10 +5,25 @@ const User = require("../models/User");
 
 const router = express.Router();
 
+const multer = require('multer');
+const path = require('path');
+const authMiddleware = require("../middleware/authMiddleware");
+
+// Multer storage for resumes
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+
 /* SIGNUP */
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -17,13 +32,13 @@ router.post("/signup", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const role = email.includes("admin") ? "admin" : "user";
+    const userRole = role || (email.includes("admin") ? "admin" : "user");
 
     const user = new User({
       name,
       email,
       password: hashedPassword,
-      role
+      role: userRole
     });
     await user.save();
 
@@ -46,6 +61,7 @@ router.post("/signup", async (req, res) => {
     });
 
   } catch (err) {
+    console.error("Signup error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -83,6 +99,50 @@ router.post("/login", async (req, res) => {
       }
     });
 
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/* GET INTERVIEWERS */
+router.get("/interviewers", authMiddleware, async (req, res) => {
+  try {
+    const interviewers = await User.find({ role: { $in: ['interviewer', 'admin'] } }).select('name email availability profile');
+    res.json(interviewers);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/* GET CANDIDATES */
+router.get("/candidates", authMiddleware, async (req, res) => {
+  try {
+    const candidates = await User.find({ role: 'user' }).select('name email');
+    res.json(candidates);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+/* UPDATE PROFILE */
+router.put("/profile", authMiddleware, upload.single('resume'), async (req, res) => {
+  try {
+    const { bio, contactNo, timezone, availability } = req.body;
+    const updateData = {
+      profile: {
+        bio,
+        contactNo,
+        timezone,
+        resumeUrl: req.file ? `/uploads/${req.file.filename}` : undefined
+      }
+    };
+
+    if (availability) {
+      updateData.availability = JSON.parse(availability);
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.id, updateData, { new: true });
+    res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }

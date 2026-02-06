@@ -1,11 +1,29 @@
 .footer {
-  background: #6a1b9a;
-  color: white;
-  display: flex;
-  justify-content: space-around;
-  padding: 20px;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  padding: 40px 20px;
+  margin-top: 60px;
+  width: 100%;
 }
 
-.footer-box {
-  max-width: 200px;
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-grid h4 {
+  color: var(--primary);
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.footer-grid p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 8px;
 }

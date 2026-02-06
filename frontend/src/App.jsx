@@ -16,166 +16,133 @@ import About from "./components/About";
 const API = "http://localhost:5000/api/interviews";
 const AUTH_API = "http://localhost:5000/api/auth";
 
+import Profile from "./components/Profile";
+
 function App() {
-  const [page, setPage] = useState("login"); // login | signup | dashboard
-  const [role, setRole] = useState("user"); // admin | user
+  const [role, setRole] = useState("user");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("token"));
-
-
   const [user, setUser] = useState({
     name: "",
     email: "",
     password: "",
+    role: "user"
   });
 
   const [interview, setInterview] = useState({
     candidate: "",
     position: "",
     date: "",
-    time: "",
+    startTime: "",
+    type: "zoom",
+    round: "screening",
+    interviewer: "",
   });
 
   const [list, setList] = useState([]);
   const [editId, setEditId] = useState(null);
 
-  // ✅ CHECK LOGIN STATUS
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-
-    if (savedToken && savedUser.role) {
+    if (savedToken && savedUser.id) {
       setToken(savedToken);
       setRole(savedUser.role);
-      // ✅ RESTORE FULL USER DETAILS
-      setUser({
-        name: savedUser.name || "",
-        email: savedUser.email || "",
-        password: ""
-      });
+      setUser(savedUser);
       setIsLoggedIn(true);
-      setPage("dashboard");
+      fetchInterviews(savedToken);
     }
   }, []);
 
-  // ... (Load interviews logic remains same)
-
-  const logout = () => {
-    setIsLoggedIn(false);
-    setRole("user");
-    setUser({ name: "", email: "", password: "" });
-    setPage("login");
-    setToken(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-  };
-
-  // ✅ LOGIN
-  const login = async () => {
-    if (!user.email || !user.password) {
-      alert("Enter email and password");
-      return;
-    }
-
+  const fetchInterviews = async (t) => {
     try {
-      const res = await axios.post(`${AUTH_API}/login`, user);
-
-      const { token, user: loggedInUser } = res.data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(loggedInUser));
-      setToken(token);
-
-      // ✅ UPDATE STATE WITH NAME
-      setUser({ ...user, name: loggedInUser.name, email: loggedInUser.email });
-
-      // 🔐 ROLE CHECK
-      setRole(loggedInUser.role);
-
-      setIsLoggedIn(true);
-      setPage("dashboard");
-    } catch {
-      alert("Invalid credentials");
-    }
-  };
-
-
-  // ✅ SIGNUP
-  const signup = async () => {
-    if (!user.email || !user.password) {
-      alert("Enter email and password");
-      return;
-    }
-
-    try {
-      const res = await axios.post(`${AUTH_API}/signup`, user);
-
-      const { token, user: loggedInUser } = res.data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(loggedInUser));
-      setToken(token);
-      setRole(loggedInUser.role);
-
-      alert(`Account created! You are logged in as: ${loggedInUser.role.toUpperCase()}`);
-      setIsLoggedIn(true);
-      setPage("dashboard");
-
-      // ✅ PERSIST USER NAME (Don't clear it!)
-      setUser({ name: loggedInUser.name, email: loggedInUser.email, password: "" });
-    } catch {
-      alert("User already exists");
-    }
-  };
-
-  // ✅ ADD / UPDATE INTERVIEW
-  const submitInterview = async () => {
-    if (!interview.candidate || !interview.position) {
-      alert("Fill all fields");
-      return;
-    }
-
-    try {
-      const config = {
-        headers: { Authorization: `Bearer ${token}` }
-      };
-
-      if (editId) {
-        await axios.put(`${API}/${editId}`, interview, config);
-        setEditId(null);
-      } else {
-        await axios.post(API, interview, config);
-      }
-
-      setInterview({
-        candidate: "",
-        position: "",
-        date: "",
-        time: "",
+      const res = await axios.get(API, {
+        headers: { Authorization: `Bearer ${t}` }
       });
-
-      // Refresh list
-      const res = await axios.get(API, config);
       setList(res.data);
-
     } catch (err) {
       console.error(err);
     }
   };
 
-  // ✅ EDIT
+  const logout = () => {
+    setIsLoggedIn(false);
+    setRole("user");
+    setUser({ name: "", email: "", password: "", role: "user" });
+    setToken(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  };
+
+  const login = async () => {
+    try {
+      const res = await axios.post(`${AUTH_API}/login`, user);
+      const { token, user: loggedInUser } = res.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(loggedInUser));
+      setToken(token);
+      setRole(loggedInUser.role);
+      setUser(loggedInUser);
+      setIsLoggedIn(true);
+      fetchInterviews(token);
+    } catch {
+      alert("Invalid credentials");
+    }
+  };
+
+  const signup = async () => {
+    try {
+      const res = await axios.post(`${AUTH_API}/signup`, user);
+      const { token, user: loggedInUser } = res.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(loggedInUser));
+      setToken(token);
+      setRole(loggedInUser.role);
+      setUser(loggedInUser);
+      setIsLoggedIn(true);
+      fetchInterviews(token);
+    } catch (err) {
+      const msg = err.response?.data?.message || "Error creating account";
+      alert(msg);
+    }
+  };
+
+  const submitInterview = async (formData) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      if (editId) {
+        await axios.put(`${API}/${editId}`, formData, config);
+        setEditId(null);
+      } else {
+        await axios.post(API, formData, config);
+      }
+      setInterview({
+        candidate: "",
+        position: "",
+        date: "",
+        startTime: "",
+        type: "zoom",
+        round: "screening",
+        interviewer: ""
+      });
+      alert(editId ? "Interview updated successfully!" : "Interview scheduled successfully!");
+      fetchInterviews(token);
+    } catch (err) {
+      console.error("Schedule Error:", err);
+      const msg = err.response?.data?.message || "Please check your connection or fill all fields.";
+      alert(`Failed to schedule interview: ${msg}`);
+    }
+  };
+
   const editInterview = (item) => {
     setInterview(item);
     setEditId(item._id);
   };
 
-  // ✅ DELETE
   const deleteInterview = async (id) => {
     try {
-      await axios.delete(`${API}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`${API}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       setList(list.filter(item => item._id !== id));
     } catch (err) {
       console.error(err);
@@ -184,63 +151,34 @@ function App() {
 
   return (
     <>
-
-      {/* ===== NAVBAR ===== */}
-      <Navbar role={role} isLoggedIn={isLoggedIn} onLogout={logout} />
-
-      {/* ===== MAIN CONTENT ===== */}
+      <Navbar role={role} isLoggedIn={isLoggedIn} onLogout={logout} user={user} />
       <div className="main">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
-
-          <Route path="/login" element={
-            !isLoggedIn ? (
-              <div className="container">
-                <Login user={user} setUser={setUser} login={login} setPage={setPage} />
-              </div>
-            ) : (
-              <Navigate to="/dashboard" />
-            )
-          } />
-
-          <Route path="/signup" element={
-            !isLoggedIn ? (
-              <div className="container">
-                <Signup user={user} setUser={setUser} signup={signup} setPage={setPage} />
-              </div>
-            ) : (
-              <Navigate to="/dashboard" />
-            )
-          } />
-
+          <Route path="/login" element={!isLoggedIn ? <Login user={user} setUser={setUser} login={login} /> : <Navigate to="/dashboard" />} />
+          <Route path="/signup" element={!isLoggedIn ? <Signup user={user} setUser={setUser} signup={signup} /> : <Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={
             isLoggedIn ? (
-              <div className="container">
-                {role === "admin" ? (
-                  <AdminDashboard
-                    interviews={list}
-                    onEdit={editInterview}
-                    onSubmit={submitInterview}
-                    onDelete={deleteInterview}
-                    interviewData={interview}
-                    setInterview={setInterview}
-                    editId={editId}
-                  />
-                ) : (
-                  <UserDashboard interviews={list} userName={user.name} />
-                )}
+              <div style={{ width: '100%' }}>
+                <AdminDashboard
+                  interviews={list}
+                  onEdit={editInterview}
+                  onSubmit={submitInterview}
+                  onDelete={deleteInterview}
+                  interviewData={interview}
+                  setInterview={setInterview}
+                  editId={editId}
+                  token={token}
+                  role={role}
+                />
               </div>
-            ) : (
-              <Navigate to="/login" />
-            )
+            ) : <Navigate to="/login" />
           } />
-
-          {/* Fallback */}
+          <Route path="/profile" element={isLoggedIn ? <Profile token={token} user={user} /> : <Navigate to="/login" />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
-
       <Footer />
     </>
   );

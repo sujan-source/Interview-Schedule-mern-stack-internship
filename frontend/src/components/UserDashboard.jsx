@@ -1,31 +1,33 @@
 import InterviewList from "./InterviewList";
+import { FaUserGraduate } from 'react-icons/fa';
 
 export default function UserDashboard({ interviews, userName }) {
-  // ✅ FRONTEND FILTER to guarantee privacy
-  const filteredInterviews = interviews.filter(i =>
-    i.candidate.toLowerCase().includes((userName || "").toLowerCase())
-  );
-
   return (
-    <>
-      <h2>User Dashboard</h2>
-
-      {/* Show who is logged in */}
-      <p style={{ color: "#555", marginBottom: "10px" }}>
-        Showing schedules for: <strong>{userName || "Unknown"}</strong>
-      </p>
-
-      {filteredInterviews.length > 0 ? (
-        <>
-          <p>Welcome! Here are the scheduled interviews.</p>
-          <InterviewList interviews={filteredInterviews} role="user" />
-        </>
-      ) : (
-        <div style={{ padding: "20px", background: "#ffebee", color: "#c62828", borderRadius: "8px", marginTop: "20px" }}>
-          <strong>No interviews found.</strong>
-          <p>We could not find any schedules matching your profile.</p>
+    <div className="user-dashboard">
+      <div className="glass-card welcome-banner" style={{ marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div className="avatar-circle">
+          <FaUserGraduate size={30} />
         </div>
-      )}
-    </>
+        <div>
+          <h2>Welcome back, {userName}!</h2>
+          <p className="text-muted">Track your interview progress and join virtual sessions.</p>
+        </div>
+      </div>
+
+      <InterviewList interviews={interviews} role="user" />
+
+      <style jsx>{`
+        .avatar-circle {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .welcome-banner h2 { margin-bottom: 5px; background: none; -webkit-text-fill-color: initial; color: white; }
+      `}</style>
+    </div>
   );
 }

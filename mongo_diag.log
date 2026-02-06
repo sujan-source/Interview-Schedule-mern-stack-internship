@@ -1,0 +1,25 @@
+Starting Diagnostic... 
+Date: Sat 12/27/2025 10:04:06.92 
+ 
+[CHECK 1] Checking PATH for mongod... 
+db version v8.2.2
+Build Info: {
+    "version": "8.2.2",
+    "gitVersion": "594f839ceec1f4385be9a690131412d67b249a0a",
+    "modules": [],
+    "allocator": "tcmalloc-gperf",
+    "environment": {
+        "distmod": "windows"
+    }
+}
+Result: 0 
+ 
+[CHECK 2] Checking common folders... 
+Not found 8.0 
+Not found 7.0 
+Not found 6.0 
+Not found 5.0 
+Not found 4.4 
+ 
+[CHECK 3] Checking if port 27017 is in use... 
+ 

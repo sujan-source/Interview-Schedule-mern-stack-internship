@@ -3,8 +3,14 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
+const path = require('path');
+const { startReminderCron } = require('./utils/reminderCron');
+
 // Load env variables
 dotenv.config();
+
+// Start reminder cron
+startReminderCron();
 
 // Import routes (IMPORT ONCE)
 const authRoutes = require("./routes/auth");
@@ -15,6 +21,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Root route
 app.get("/", (req, res) => {
